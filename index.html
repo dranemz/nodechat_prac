@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat</title>
+
+    <style>
+        .outer{
+            width: 900px;
+            margin: auto;
+        }
+        .room{
+            width: 400px;
+            margin: 5px;
+            float: left;
+        }
+        .messages{
+            width: 400px;
+            height: 300px;
+            background-color: aqua;
+        }
+        .txt-send{
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="outer">
+        <div class="room">
+            <h1>Node</h1>
+            <div class="messages" id="nMessages"></div>
+            <form id="nForm">
+                <input type="text" name="" id="nTxt" class="txt-send">
+                <input type="button" value="Send" id="nBtn" class="btn">
+            </form>
+        </div>
+        <div class="room">
+            <h1>Python</h1>
+            <div class="messages" id="pMessages"></div>
+            <form id="pForm">
+                <input type="text" name="" id="pTxt" class="txt-send">
+                <input type="button" value="Send" id="pBtn" class="btn">
+            </form>
+        </div>
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on("connect", () => {
+            var nRoom = "nRoom";
+            socket.emit('nRoom', nRoom);
+
+            var pRoom = "pRoom";
+            socket.emit("pRoom", pRoom);
+        });
+        //NODE
+        var nForm = document.getElementById("nForm");
+        var nBtn = document.getElementById("nBtn");
+        var nTxt = document.getElementById("nTxt");
+        var nMessages = document.getElementById("nMessages");
+
+        nForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            socket.emit("node new message", nTxt.value);
+            nTxt.value = '';
+        });
+
+        // nBtn.addEventListener("click", () => {
+        //     socket.emit("node new message", nTxt.value);
+        // });
+
+        socket.on("node news", (data) => {
+            nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;                                      
+        });
+
+        socket.on("node new user", (data) => {
+            nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;                                      
+        });
+
+        //PYTHON
+        var pForm = document.getElementById("pForm");
+        var pBtn = document.getElementById("pBtn");
+        var pTxt = document.getElementById("pTxt");
+        var pMessages = document.getElementById("pMessages");
+
+        pForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            socket.emit("python new message", pTxt.value);
+            pTxt.value = '';
+        });
+        // pBtn.addEventListener("click", () => {
+        //     socket.emit("python new message", pTxt.value);
+        // });
+
+        socket.on("python news", (data) => {
+            pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;                                      
+        });
+
+        socket.on("python new user", (data) => {
+            pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;                                      
+        });
+
+    </script>
+</body>
+</html>
